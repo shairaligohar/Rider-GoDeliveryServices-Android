@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "446025079075",
+    "firebase_url": "https://rider-14ebc.firebaseio.com",
+    "project_id": "rider-14ebc",
+    "storage_bucket": "rider-14ebc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446025079075:android:d2f96ee5c23a6f6a9b5496",
+        "android_client_info": {
+          "package_name": "com.godeliveryservices.rider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "446025079075-t1dlrdi2lc8tpvsk3vgdft9dn6mud1sb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.godeliveryservices.rider",
+            "certificate_hash": "73f880d972a1fc8d6b69ca8d64ef4ca162868ac2"
+          }
+        },
+        {
+          "client_id": "446025079075-jd4c0fa3e58k046om7k52t8h1fvc9pir.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyfdEho7NUKUefOoPTj9eWpZHU0putEy8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "446025079075-jd4c0fa3e58k046om7k52t8h1fvc9pir.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
