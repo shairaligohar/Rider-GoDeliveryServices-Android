@@ -23,7 +23,7 @@
 
         <TextView
             app:layout_constraintEnd_toEndOf="parent"
-            android:id="@+id/order_number_text"
+            android:id="@+id/order_price_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="8dp"
@@ -35,7 +35,7 @@
             style="@style/TextAppearance.MaterialComponents.Subtitle1"
             android:textColor="@android:color/white"
             app:layout_constraintTop_toTopOf="parent"
-            android:text="PKR 150" />
+            android:text="AED 150" />
 
         <TextView
             android:id="@+id/order_description_text"
@@ -76,6 +76,7 @@
             android:id="@+id/branch_contact_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="#3A33FF"
             android:text="Branch Contact" />
 
         <TextView
@@ -101,6 +102,7 @@
             android:layout_height="0dp"
             android:background="#eeeeee"
             android:layout_marginTop="4dp"
+            android:visibility="invisible"
             app:layout_constraintTop_toBottomOf="@id/separator"
             app:layout_constraintBottom_toBottomOf="@id/branch_contact_text"
             app:layout_constraintStart_toStartOf="parent"

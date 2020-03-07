@@ -2,22 +2,25 @@ package com.godeliveryservices.rider.ui.login
 
 import android.app.Activity
 import android.content.Intent
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.preference.PreferenceManager
 import com.godeliveryservices.rider.MainActivity
-
 import com.godeliveryservices.rider.R
+import com.godeliveryservices.rider.repository.PreferenceRepository
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.iid.FirebaseInstanceId
 
 class LoginActivity : AppCompatActivity() {
 
@@ -25,7 +28,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_login)
 
         val username = findViewById<EditText>(R.id.username)
@@ -54,17 +56,23 @@ class LoginActivity : AppCompatActivity() {
             val loginResult = it ?: return@Observer
 
             loading.visibility = View.GONE
-            if (loginResult.error != null) {
-                showLoginFailed(loginResult.error)
+            if (!loginResult.success) {
+                showLoginFailed(loginResult.code)
             }
-            if (loginResult.success != null) {
-                updateUiWithUser(loginResult.success)
+            if (loginResult.success && loginResult.rider != null) {
+                PreferenceRepository(applicationContext).saveRiderData(loginResult.rider)
+                instantiateFirebaseToken(loginResult.rider.RiderID)
+                Toast.makeText(applicationContext, "Logged In Successful!", Toast.LENGTH_LONG)
+//                updateUiWithUser(loginResult.success)
+                PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
+                    .putBoolean("LoggedIn", true).apply()
                 startActivity(Intent(this, MainActivity::class.java))
-            }
-            setResult(Activity.RESULT_OK)
 
-            //Complete and destroy login activity once successful
-            finish()
+                setResult(Activity.RESULT_OK)
+
+                //Complete and destroy login activity once successful
+                finish()
+            }
         })
 
         username.afterTextChanged {
@@ -111,8 +119,31 @@ class LoginActivity : AppCompatActivity() {
 //        ).show()
     }
 
-    private fun showLoginFailed(@StringRes errorString: Int) {
-        Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
+    private fun showLoginFailed(errorString: Int) {
+        Toast.makeText(
+            applicationContext,
+            "Loggin failed with status code: $errorString",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun instantiateFirebaseToken(riderId: Long) {
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w("Firebase Token", "getInstanceId failed", task.exception)
+                    return@OnCompleteListener
+                }
+
+                // Get new Instance ID token
+                val token = task.result?.token
+                token?.let { loginViewModel.saveToken(riderId, token) }
+
+                // Log and toast
+                val msg = getString(R.string.msg_token_fmt, token)
+                Log.d("Firebase Token", msg)
+                //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+            })
     }
 }
 

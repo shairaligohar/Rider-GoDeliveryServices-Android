@@ -44,7 +44,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/customer_name_text"
+            android:id="@+id/branch_name_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -53,21 +53,22 @@
             app:layout_constraintTop_toBottomOf="@+id/order_number_text" />
 
         <TextView
-            android:id="@+id/customer_phone"
+            android:id="@+id/customer_name_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Customer Name"
+            android:visibility="invisible"
             app:layout_constraintStart_toEndOf="@+id/order_date_text"
-            app:layout_constraintTop_toBottomOf="@+id/customer_name_text" />
+            app:layout_constraintTop_toBottomOf="@+id/branch_name_text" />
 
         <TextView
-            android:id="@+id/rider_name_text"
+            android:id="@+id/price_text"
             style="@style/TextAppearance.MaterialComponents.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="PKR 1024"
+            android:text="AED 0.0"
             android:textColor="@color/colorPrimaryDark"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

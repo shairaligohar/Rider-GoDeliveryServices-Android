@@ -6,9 +6,13 @@ import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.Preference
+import androidx.preference.PreferenceManager
+import com.godeliveryservices.rider.MainActivity
 import com.godeliveryservices.rider.R
 import com.godeliveryservices.rider.ui.login.LoginActivity
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.iid.FirebaseInstanceId
 
 class SplashActivity : AppCompatActivity() {
@@ -19,27 +23,16 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        FirebaseInstanceId.getInstance().instanceId
-            .addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w("Firebase Token", "getInstanceId failed", task.exception)
-                    return@OnCompleteListener
-                }
-
-                // Get new Instance ID token
-                val token = task.result?.token
-
-                // Log and toast
-                val msg = getString(R.string.msg_token_fmt, token)
-                Log.d("Firebase Token", msg)
-                //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-            })
+        val isUserLoggedIn: Boolean = PreferenceManager.getDefaultSharedPreferences(applicationContext).getBoolean("LoggedIn", false)
 
         Handler().postDelayed({
             // This method will be executed once the timer is over
             // Start your app main activity
 
-            startActivity(Intent(this, LoginActivity::class.java))
+            if(isUserLoggedIn)
+                startActivity(Intent(this, MainActivity::class.java))
+            else
+                startActivity(Intent(this, LoginActivity::class.java))
 
             // close this activity
             finish()

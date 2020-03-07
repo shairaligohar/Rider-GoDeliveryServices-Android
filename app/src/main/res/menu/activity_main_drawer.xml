@@ -3,23 +3,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="none">
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_in_out_black_24dp"
             android:title="Logout" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Helpline">
         <menu>
+            <!--            <item-->
+            <!--                android:id="@+id/nav_share"-->
+            <!--                android:icon="@drawable/ic_feedback_black_24dp"-->
+            <!--                android:title="Feedback" />-->
+            <!--            <item-->
+            <!--                android:id="@+id/nav_send"-->
+            <!--                android:icon="@drawable/ic_rate_review_black_24dp"-->
+            <!--                android:title="Rate us" />-->
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_feedback_black_24dp"
-                android:title="Feedback" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_rate_review_black_24dp"
-                android:title="Rate us" />
+                android:id="@+id/nav_helpline"
+                android:icon="@android:drawable/ic_menu_call"
+                android:title="+971 4 396 2666" />
         </menu>
     </item>
 

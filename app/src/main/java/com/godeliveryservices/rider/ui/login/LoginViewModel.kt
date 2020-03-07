@@ -1,13 +1,16 @@
 package com.godeliveryservices.rider.ui.login
 
+import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import android.util.Patterns
-import com.godeliveryservices.rider.data.LoginRepository
-import com.godeliveryservices.rider.data.Result
-
 import com.godeliveryservices.rider.R
+import com.godeliveryservices.rider.data.LoginRepository
+import com.godeliveryservices.rider.network.ApiService
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import retrofit2.HttpException
 
 class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 
@@ -17,16 +20,37 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> = _loginResult
 
+    private val apiService = ApiService.create()
+    private var disposable: Disposable? = null
+
     fun login(username: String, password: String) {
         // can be launched in a separate asynchronous job
-        val result = loginRepository.login(username, password)
+//        val result = loginRepository.login(username, password)
+//
+//        if (result is Result.Success) {
+//            _loginResult.value =
+//                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
+//        } else {
+//            _loginResult.value = LoginResult(error = R.string.login_failed)
+//        }
 
-        if (result is Result.Success) {
-            _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
-        } else {
-            _loginResult.value = LoginResult(error = R.string.login_failed)
-        }
+        disposable = apiService.login(username, password)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { success ->
+                    _loginResult.value =
+                        LoginResult(
+                            success = success.isSuccessful,
+                            code = success.code(),
+                            rider = success.body()
+                        )
+                },
+                { error ->
+                    _loginResult.value =
+                        LoginResult(success = false, code = (error as HttpException).code())
+                }
+            )
     }
 
     fun loginDataChanged(username: String, password: String) {
@@ -51,5 +75,22 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     // A placeholder password validation check
     private fun isPasswordValid(password: String): Boolean {
         return password.length > 5
+    }
+
+    fun saveToken(
+        riderId: Long,
+        token: String
+    ) {
+        disposable = apiService.saveToken(riderId, token)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                { success ->
+                    success
+                },
+                { error ->
+                    error
+                }
+            )
     }
 }
