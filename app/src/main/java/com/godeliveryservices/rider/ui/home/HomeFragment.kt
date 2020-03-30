@@ -112,7 +112,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, OnListFragmentInteractionLi
 
     override fun onNavigationClickListener(item: Order) {
         val address =
-            if (item.Status == "Accepted") "Bait Al Thouq Traditional Kitchen Dubai" else item.CustomerAddress
+            if (item.Status == "Accepted") item.BranchAddress else item.CustomerAddress
         val intent = Intent(
             Intent.ACTION_VIEW,
             Uri.parse("google.navigation:q=${address}")

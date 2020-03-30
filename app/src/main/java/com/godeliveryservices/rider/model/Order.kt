@@ -7,6 +7,7 @@ import java.util.*
 data class Order(
     val Amount: Double,
     val CustomerAddress: String,
+    val BranchAddress: String,
     val CustomerName: String,
     val CustomerNumber: String,
     val DeliveredDate: Any,

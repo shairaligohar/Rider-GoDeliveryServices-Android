@@ -76,7 +76,7 @@
             android:id="@+id/branch_contact_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#3A33FF"
+            android:textColor="@color/colorPrimary"
             android:text="Branch Contact" />
 
         <TextView
@@ -93,6 +93,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/colorPrimary"
             app:layout_constraintTop_toBottomOf="@id/customer_name_text"
             android:text="Customer Contact" />
 

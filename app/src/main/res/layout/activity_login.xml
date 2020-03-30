@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:contentDescription="login logo"
-        android:src="@drawable/logo_with_text"
+        android:src="@drawable/kangaroo_logo_with_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.1" />
