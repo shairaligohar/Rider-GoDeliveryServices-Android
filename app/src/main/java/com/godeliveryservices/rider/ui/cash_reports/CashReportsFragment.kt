@@ -6,8 +6,10 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.godeliveryservices.rider.R
 import com.godeliveryservices.rider.model.Order
 import com.godeliveryservices.rider.repository.PreferenceRepository
@@ -48,7 +50,6 @@ class CashReportsFragment : Fragment(), OnListFragmentInteractionListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         init()
         setupObservers()
     }
@@ -57,6 +58,8 @@ class CashReportsFragment : Fragment(), OnListFragmentInteractionListener {
         cashReportsViewModel =
             ViewModelProviders.of(this).get(CashReportsViewModel::class.java)
         setDefaultFilters()
+
+        list_layout.setOnRefreshListener { fetchData() }
     }
 
     private fun fetchData() {
@@ -70,19 +73,22 @@ class CashReportsFragment : Fragment(), OnListFragmentInteractionListener {
             androidx.lifecycle.Observer { orders ->
                 total_cash_text.text = "AED ${orders.first().Cash}"
                 recyclerViewAdapter.setValues(orders)
+                unavailable_text.visibility = View.GONE
             })
 
         cashReportsViewModel.showLoading.observe(
             viewLifecycleOwner,
             androidx.lifecycle.Observer { flag ->
-                loading.visibility = if (flag) View.VISIBLE else View.GONE
+                list_layout.isRefreshing = flag
+//                loading.visibility = if (flag) View.VISIBLE else View.GONE
             })
 
         cashReportsViewModel.responseMessage.observe(
             viewLifecycleOwner,
             androidx.lifecycle.Observer { message ->
                 resetData()
-                Snackbar.make(content_cash_reports, message, Snackbar.LENGTH_LONG).show()
+//                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                unavailable_text.visibility = View.VISIBLE
             })
 
         cashReportsViewModel.orderFilters.observe(

@@ -38,17 +38,19 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { success ->
-                    _loginResult.value =
-                        LoginResult(
-                            success = success.isSuccessful,
-                            code = success.code(),
-                            rider = success.body()
-                        )
+                { result ->
+                    if (result.code() == 200)
+                        _loginResult.value = LoginResult(success = true, rider = result.body())
+                    else
+                        _loginResult.value =
+                            LoginResult(
+                                success = false,
+                                errorMessage = result.errorBody()?.string()
+                            )
                 },
                 { error ->
                     _loginResult.value =
-                        LoginResult(success = false, code = (error as HttpException).code())
+                        LoginResult(success = false, errorMessage = "Connection Timeout")
                 }
             )
     }
@@ -75,22 +77,5 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     // A placeholder password validation check
     private fun isPasswordValid(password: String): Boolean {
         return password.length > 5
-    }
-
-    fun saveToken(
-        riderId: Long,
-        token: String
-    ) {
-        disposable = apiService.saveToken(riderId, token)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe(
-                { success ->
-                    success
-                },
-                { error ->
-                    error
-                }
-            )
     }
 }

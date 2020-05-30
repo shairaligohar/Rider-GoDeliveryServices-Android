@@ -56,16 +56,13 @@ class LoginActivity : AppCompatActivity() {
             val loginResult = it ?: return@Observer
 
             loading.visibility = View.GONE
-            if (!loginResult.success) {
-                showLoginFailed(loginResult.code)
-            }
-            if (loginResult.success && loginResult.rider != null) {
+            if (loginResult.success.not()) {
+                showLoginFailed(loginResult.errorMessage)
+            } else if (loginResult.rider != null) {
                 PreferenceRepository(applicationContext).saveRiderData(loginResult.rider)
-                instantiateFirebaseToken(loginResult.rider.RiderID)
-                Toast.makeText(applicationContext, "Logged In Successful!", Toast.LENGTH_LONG)
+//            PreferenceRepository(applicationContext).saveRiderData()
+//                Toast.makeText(applicationContext, "Logged In Successful!", Toast.LENGTH_LONG).show()
 //                updateUiWithUser(loginResult.success)
-                PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
-                    .putBoolean("LoggedIn", true).apply()
                 startActivity(Intent(this, MainActivity::class.java))
 
                 setResult(Activity.RESULT_OK)
@@ -108,42 +105,8 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome)
-        val displayName = model.displayName
-        // TODO : initiate successful logged in experience
-//        Toast.makeText(
-//            applicationContext,
-//            "$welcome $displayName",
-//            Toast.LENGTH_LONG
-//        ).show()
-    }
-
-    private fun showLoginFailed(errorString: Int) {
-        Toast.makeText(
-            applicationContext,
-            "Loggin failed with status code: $errorString",
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
-    private fun instantiateFirebaseToken(riderId: Long) {
-        FirebaseInstanceId.getInstance().instanceId
-            .addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w("Firebase Token", "getInstanceId failed", task.exception)
-                    return@OnCompleteListener
-                }
-
-                // Get new Instance ID token
-                val token = task.result?.token
-                token?.let { loginViewModel.saveToken(riderId, token) }
-
-                // Log and toast
-                val msg = getString(R.string.msg_token_fmt, token)
-                Log.d("Firebase Token", msg)
-                //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-            })
+    private fun showLoginFailed(errorString: String?) {
+        Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
 }
 

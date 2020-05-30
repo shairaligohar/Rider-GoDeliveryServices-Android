@@ -8,6 +8,7 @@ import com.godeliveryservices.rider.network.ApiService
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import retrofit2.HttpException
 
 class CashReportsViewModel : ViewModel() {
     private val apiService = ApiService.create()
@@ -35,16 +36,16 @@ class CashReportsViewModel : ViewModel() {
         )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ success ->
+            .subscribe({ response ->
                 _showLoading.value = false
-                if (success.code() == 200) {
-                    _orders.value = success.body()
+                if (response.code() == 200) {
+                    _orders.value = response.body()
                 } else {
-                    _responseMessage.value = success.message()
+                    _responseMessage.value = response.errorBody()?.string()
                 }
-            }, { error ->
+            }, {
                 _showLoading.value = false
-                _responseMessage.value = error.message
+//                _responseMessage.value = "Please check your internet connection!"
             })
     }
 }

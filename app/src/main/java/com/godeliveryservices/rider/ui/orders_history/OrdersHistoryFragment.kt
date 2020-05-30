@@ -87,20 +87,6 @@ class OrdersHistoryFragment : Fragment() {
 //                if (viewPager.currentItem == 0)
 //                    Snackbar.make(order_history_layout, message, Snackbar.LENGTH_LONG).show()
 //            })
-
-        ordersHistoryViewModel.responseMessageProcessing.observe(
-            viewLifecycleOwner,
-            androidx.lifecycle.Observer { message ->
-                if (viewPager.currentItem == 0)
-                    Snackbar.make(order_history_layout, message, Snackbar.LENGTH_LONG).show()
-            })
-
-        ordersHistoryViewModel.responseMessageDelivered.observe(
-            viewLifecycleOwner,
-            androidx.lifecycle.Observer { message ->
-                if (viewPager.currentItem == 1)
-                    Snackbar.make(order_history_layout, message, Snackbar.LENGTH_LONG).show()
-            })
     }
 
     private fun showFilterDialog() {

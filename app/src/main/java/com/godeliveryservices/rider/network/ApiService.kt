@@ -62,4 +62,10 @@ interface ApiService {
         @Query("RiderID") riderId: Long,
         @Query("location") location: String
     ): Observable<Response<Void>>
+
+    @POST("/api/rider")
+    fun updateStatus(
+        @Query("RiderID") riderId: Long,
+        @Query("Status") isActive: Boolean
+    ): Observable<Response<Void>>
 }

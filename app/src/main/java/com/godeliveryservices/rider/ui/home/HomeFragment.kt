@@ -1,10 +1,16 @@
 package com.godeliveryservices.rider.ui.home
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -14,7 +20,8 @@ import com.godeliveryservices.rider.repository.PreferenceRepository
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
@@ -24,6 +31,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback, OnListFragmentInteractionLi
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var newOrdersAdapter: NewOrderRecyclerViewAdapter
     private lateinit var activeOrdersAdapter: ActiveOrdersRecyclerViewAdapter
+
+    private val riderId by lazy { PreferenceRepository(requireContext()).getRiderId() }
+    private val riderStatus by lazy { PreferenceRepository(requireContext()).getRiderStatus() }
 
     // TODO: Customize parameters
     private var columnCount = 1
@@ -77,7 +87,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback, OnListFragmentInteractionLi
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        mMap.isMyLocationEnabled = true
+        //mMap.isMyLocationEnabled = true
 
         mMap.setOnMapLoadedCallback {
 
@@ -97,6 +107,12 @@ class HomeFragment : Fragment(), OnMapReadyCallback, OnListFragmentInteractionLi
     override fun onResume() {
         super.onResume()
         setHasOptionsMenu(true)
+        context?.registerReceiver(mMessageReceiver, IntentFilter("Refresh"))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        context?.unregisterReceiver(mMessageReceiver)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -142,7 +158,14 @@ class HomeFragment : Fragment(), OnMapReadyCallback, OnListFragmentInteractionLi
     }
 
     private fun setupData() {
-        val riderId = PreferenceRepository(requireContext()).getRiderId()
+        status_toggle.isChecked = riderStatus.equals("Active")
+        status_toggle.setOnClickListener { _ ->
+            homeViewModel.updateStatus(
+                riderId = riderId,
+                isActive = status_toggle.isChecked
+            )
+        }
+        instantiateFirebaseToken(riderId)
         homeViewModel.fetchOrders(riderId)
     }
 
@@ -157,10 +180,56 @@ class HomeFragment : Fragment(), OnMapReadyCallback, OnListFragmentInteractionLi
 
         homeViewModel.showLoading.observe(viewLifecycleOwner, Observer { flag ->
             loading.visibility = if (flag) View.VISIBLE else View.GONE
+            status_toggle.isEnabled = flag.not()
         })
 
         homeViewModel.responseMessage.observe(viewLifecycleOwner, Observer { message ->
-            Snackbar.make(home_container, message, Snackbar.LENGTH_LONG).show()
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         })
+
+        homeViewModel.riderStatusUpdated.observe(viewLifecycleOwner, Observer { yes ->
+            if (yes) {
+                PreferenceRepository(requireContext())
+                    .updateRiderStatus(if (status_toggle.isChecked) "Active" else "Inactive")
+                if (status_toggle.isChecked)
+                    homeViewModel.fetchOrders(riderId)
+            } else {
+                status_toggle.isChecked = true
+            }
+        })
+
+        homeViewModel.noActiveOrder.observe(viewLifecycleOwner, Observer { yes ->
+            no_active_orders_text.visibility = if (yes) View.VISIBLE else View.GONE
+        })
+
+        homeViewModel.noNewOrder.observe(viewLifecycleOwner, Observer { yes ->
+            no_new_orders_text.visibility = if (yes) View.VISIBLE else View.GONE
+        })
+    }
+
+    private fun instantiateFirebaseToken(riderId: Long) {
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w("Firebase Token", "getInstanceId failed", task.exception)
+                    return@OnCompleteListener
+                }
+
+                // Get new Instance ID token
+                val token = task.result?.token
+                token?.let { homeViewModel.saveToken(riderId, token) }
+
+                // Log and toast
+                val msg = getString(R.string.msg_token_fmt, token)
+                Log.d("Firebase Token", msg)
+                //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+            })
+    }
+
+
+    private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            homeViewModel.fetchOrders(riderId)
+        }
     }
 }

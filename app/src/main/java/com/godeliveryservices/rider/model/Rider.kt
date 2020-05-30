@@ -11,7 +11,7 @@ data class Rider(
     val Password: Any,
     val RiderID: Long,
     val ShopBranches: Any,
-    val Status: Any,
+    val Status: String,
     val Token: String,
     val Username: String
 )

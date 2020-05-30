@@ -99,7 +99,7 @@ class LocationForegroundService : Service() {
             setContentTitle("Location Service")
             setContentText("Sending location updates to server ...")
             setOngoing(true)
-            setSmallIcon(R.drawable.kangaroo_logo_without_text)
+            setSmallIcon(R.drawable.logo_without_text)
             setOnlyAlertOnce(true)
             return@with build()
         }

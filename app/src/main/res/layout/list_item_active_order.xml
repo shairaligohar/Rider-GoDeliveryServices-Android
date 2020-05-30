@@ -124,6 +124,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Navigation"
+            android:textSize="12sp"
             app:icon="@drawable/ic_navigation_black_24dp"
             app:iconGravity="end"
             app:iconTint="@color/colorAccent"
@@ -136,6 +137,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Status"
+            android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/customer_phone_text" />
 

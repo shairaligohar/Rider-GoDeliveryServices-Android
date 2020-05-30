@@ -6,13 +6,17 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.graphics.Color
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+
 
 class FirebaseNotificationReceiver : FirebaseMessagingService() {
 
@@ -53,6 +57,7 @@ class FirebaseNotificationReceiver : FirebaseMessagingService() {
         // Check if message contains a notification payload.
         remoteMessage.notification?.let {
             sendNotification(it)
+            applicationContext.sendBroadcast(Intent("Refresh"))
             Log.d(TAG, "Message Notification Body: ${it.body}")
         }
 
@@ -115,29 +120,40 @@ class FirebaseNotificationReceiver : FirebaseMessagingService() {
     private fun sendNotification(notification: RemoteMessage.Notification) {
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-            PendingIntent.FLAG_ONE_SHOT)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0 /* Request code */, intent,
+            PendingIntent.FLAG_ONE_SHOT
+        )
 
         val channelId = getString(R.string.default_notification_channel_id)
-        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val customSound =
+            Uri.parse("android.resource://" + packageName + "/" + R.raw.custom_sound);
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.ic_launcher_kangaroo_round))
-            .setSmallIcon(R.drawable.kangaroo_logo_without_text)
+            .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher_round))
+            .setSmallIcon(R.drawable.logo_without_text)
             .setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE)
             .setContentTitle(notification.title)
             .setContentText(notification.body)
             //.setColor(Color.rgb(102, 195, 53))
             .setAutoCancel(true)
-            .setSound(defaultSoundUri)
+            .setSound(customSound)
             .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Since android Oreo notification channel is needed.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId,
+            val channel = NotificationChannel(
+                channelId,
                 "Channel human readable title",
-                NotificationManager.IMPORTANCE_DEFAULT)
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            val attributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .build()
+            channel.setSound(customSound, attributes)
             notificationManager.createNotificationChannel(channel)
         }
 

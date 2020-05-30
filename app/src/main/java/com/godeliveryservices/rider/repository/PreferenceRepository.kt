@@ -12,14 +12,23 @@ class PreferenceRepository(val context: Context) {
         const val RIDER_USER_NAME = "RIDER_USER_NAME"
         const val RIDER_NAME = "RIDER_NAME"
         const val RIDER_ID = "RIDER_ID"
+        const val STATUS = "STATUS"
+        const val Logged_IN = "LoggedIn"
     }
 
-    fun saveRiderData(shop: Rider) {
+    fun saveRiderData(rider: Rider) {
+//    fun saveRiderData() {
         sharedPreference.edit().apply {
-            putString(Keys.RIDER_USER_NAME, shop.Username)
-            putString(Keys.RIDER_NAME, shop.Name)
-            putLong(Keys.RIDER_ID, shop.RiderID)
+            putString(Keys.RIDER_USER_NAME, rider.Username)
+            putString(Keys.RIDER_NAME, rider.Name)
+            putLong(Keys.RIDER_ID, rider.RiderID)
+            putString(Keys.STATUS, "Active")
+            putBoolean(Keys.Logged_IN, true)
         }.apply()
+    }
+
+    fun updateRiderStatus(status: String) {
+        sharedPreference.edit().putString(Keys.STATUS, status).apply()
     }
 
     fun getRiderId(): Long {
@@ -32,5 +41,9 @@ class PreferenceRepository(val context: Context) {
 
     fun getRiderUserName(): String? {
         return sharedPreference.getString(Keys.RIDER_USER_NAME, "")
+    }
+
+    fun getRiderStatus(): String? {
+        return sharedPreference.getString(Keys.STATUS, "")
     }
 }

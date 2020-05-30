@@ -52,23 +52,23 @@ class OrdersHistoryViewModel : ViewModel() {
                 _showLoading.value = false
                 if (success.code() == 200) {
                     when (status) {
-                        "Pending" -> _pendingOrders.value = success.body()
                         "Active" -> _processingOrders.value = success.body()
                         "Delivered" -> _deliveredOrders.value = success.body()
                     }
                 } else {
                     when (status) {
-                        "Pending" -> _responseMessagePending.value = success.message()
-                        "Active" -> _responseMessageProcessing.value = success.message()
-                        "Delivered" -> _responseMessageDelivered.value = success.message()
+                        "Active" -> _responseMessageProcessing.value = success.errorBody()?.string()
+                        "Delivered" -> _responseMessageDelivered.value =
+                            success.errorBody()?.string()
                     }
                     clearOrders(status)
                 }
             }, { error ->
                 when (status) {
-                    "Pending" -> _responseMessagePending.value = error.message
-                    "Active" -> _responseMessageProcessing.value = error.message
-                    "Delivered" -> _responseMessageDelivered.value = error.message
+                    "Active" -> _responseMessageProcessing.value =
+                        "Please check your internet connection!"
+                    "Delivered" -> _responseMessageDelivered.value =
+                        "Please check your internet connection!"
                 }
                 _showLoading.value = false
                 clearOrders(status)

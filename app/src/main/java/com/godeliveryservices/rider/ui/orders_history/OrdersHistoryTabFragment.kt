@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -18,6 +19,8 @@ import kotlinx.android.synthetic.main.fragment_tab_orders_history.view.*
  */
 class OrdersHistoryTabFragment : Fragment(),
     OnListFragmentInteractionListener {
+
+    private val riderId by lazy { PreferenceRepository(requireContext()).getRiderId() }
 
     // TODO: Customize parameters
     private var columnCount = 1
@@ -83,12 +86,18 @@ class OrdersHistoryTabFragment : Fragment(),
     }
 
     private fun fetchData() {
-        val riderId = PreferenceRepository(requireContext()).getRiderId()
         when (sectionNumber) {
-//            0 -> pageViewModel.fetchOrders("Pending", riderId)
-            0 -> pageViewModel.fetchOrders("Active", riderId)
-            1 -> pageViewModel.fetchOrders("Delivered", riderId)
+            0 -> fetchActiveOrders()
+            1 -> fetchDeliveredOrders()
         }
+    }
+
+    private fun fetchActiveOrders() {
+        pageViewModel.fetchOrders("Active", riderId)
+    }
+
+    private fun fetchDeliveredOrders() {
+        pageViewModel.fetchOrders("Delivered", riderId)
     }
 
     private fun setupObservers() {
@@ -97,16 +106,41 @@ class OrdersHistoryTabFragment : Fragment(),
 //                adapter.setValues(orders)
 //        })
         pageViewModel.processingOrders.observe(viewLifecycleOwner, Observer { orders ->
-            if (sectionNumber == 0)
+            if (sectionNumber == 0) {
                 adapter.setValues(orders)
+                unavailable_text.visibility = if (orders.isEmpty()) View.VISIBLE else View.GONE
+            }
         })
         pageViewModel.deliveredOrders.observe(viewLifecycleOwner, Observer { orders ->
-            if (sectionNumber == 1)
+            if (sectionNumber == 1) {
                 adapter.setValues(orders)
+                unavailable_text.visibility = if (orders.isEmpty()) View.VISIBLE else View.GONE
+            }
         })
 
+        pageViewModel.responseMessageProcessing.observe(
+            viewLifecycleOwner,
+            androidx.lifecycle.Observer { message ->
+                if (sectionNumber == 0) {
+//                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                    unavailable_text.text = "No Active Orders"
+                    unavailable_text.visibility = View.VISIBLE
+                }
+            })
+
+        pageViewModel.responseMessageDelivered.observe(
+            viewLifecycleOwner,
+            androidx.lifecycle.Observer { message ->
+                if (sectionNumber == 1) {
+//                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                    unavailable_text.text = "No Delivered Orders"
+                    unavailable_text.visibility = View.VISIBLE
+                }
+            })
+
         pageViewModel.showLoading.observe(viewLifecycleOwner, Observer { flag ->
-            loading.visibility = if (flag) View.VISIBLE else View.GONE
+//            loading.visibility = if (flag) View.VISIBLE else View.GONE
+            list_layout.isRefreshing = flag
         })
 
         pageViewModel.orderFilters.observe(viewLifecycleOwner, Observer { filters ->
@@ -115,6 +149,6 @@ class OrdersHistoryTabFragment : Fragment(),
     }
 
     private fun setupViews() {
-
+        list_layout.setOnRefreshListener { fetchData() }
     }
 }
