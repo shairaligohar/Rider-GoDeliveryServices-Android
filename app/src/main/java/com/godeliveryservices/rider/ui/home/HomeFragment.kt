@@ -1,5 +1,7 @@
 package com.godeliveryservices.rider.ui.home
 
+import android.app.Activity
+import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -8,9 +10,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -24,6 +27,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
+import kotlinx.android.synthetic.main.pass_remarks_dialog.*
 
 
 class HomeFragment : Fragment(), OnMapReadyCallback, OnListFragmentInteractionListener {
@@ -123,7 +127,20 @@ class HomeFragment : Fragment(), OnMapReadyCallback, OnListFragmentInteractionLi
         if (item.RiderID == null) {
             item.RiderID = PreferenceRepository(requireContext()).getRiderId()
         }
-        homeViewModel.updateOrderStatus(item)
+        updateOrderStatus(item)
+    }
+
+    private fun updateOrderStatus(item: Order) {
+        item.Status = when (item.Status) {
+            "Pending" -> "Accepted"
+            "Accepted" -> "Picked Up"
+            "Picked Up" -> "Delivered"
+            else -> "Pending"
+        }
+        if (item.Status == "Delivered")
+            showRemarksDialog(item)
+        else
+            homeViewModel.updateOrderStatus(item)
     }
 
     override fun onNavigationClickListener(item: Order) {
@@ -226,6 +243,22 @@ class HomeFragment : Fragment(), OnMapReadyCallback, OnListFragmentInteractionLi
             })
     }
 
+    private fun showRemarksDialog(item: Order) {
+        val dialog = Dialog(requireContext())
+
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.pass_remarks_dialog)
+        val dialogButton: Button = dialog.findViewById(R.id.done_button) as Button
+        dialogButton.setOnClickListener {
+            item.Status = "Delivered-${dialog.remarks.text.toString().trim()}"
+            dialog.dismiss()
+            homeViewModel.updateOrderStatus(item)
+        }
+        dialog.show()
+
+        val window: Window? = dialog.window
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
 
     private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {

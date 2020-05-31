@@ -27,7 +27,7 @@ data class Order(
     val ShopBranch: Branch?,
     val BranchName: String,
     val ShopBranchID: Long,
-    val Status: String,
+    var Status: String,
     val Cash: String,
     val BranchContact: String
 ) {

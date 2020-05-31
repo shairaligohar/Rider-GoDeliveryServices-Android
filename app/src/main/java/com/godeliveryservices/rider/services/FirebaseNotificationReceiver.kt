@@ -129,12 +129,12 @@ class FirebaseNotificationReceiver : FirebaseMessagingService() {
         val customSound =
             Uri.parse("android.resource://" + packageName + "/" + R.raw.custom_sound);
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher_round))
+//            .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher_round))
             .setSmallIcon(R.drawable.logo_without_text)
             .setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE)
             .setContentTitle(notification.title)
             .setContentText(notification.body)
-            //.setColor(Color.rgb(102, 195, 53))
+            .setColor(resources.getColor(R.color.colorPrimary))
             .setAutoCancel(true)
             .setSound(customSound)
             .setContentIntent(pendingIntent)

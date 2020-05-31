@@ -92,16 +92,10 @@ class HomeViewModel : ViewModel() {
 
     fun updateOrderStatus(order: Order) {
         _showLoading.value = true
-        var flag = "Pending"
-        when (order.Status) {
-            "Pending" -> flag = "Accepted"
-            "Accepted" -> flag = "Picked Up"
-            "Picked Up" -> flag = "Delivered"
-        }
         disposable = apiService.updateOrderStatus(
             orderId = order.OrderID,
             riderId = order.RiderID,
-            flag = flag
+            flag = order.Status
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
