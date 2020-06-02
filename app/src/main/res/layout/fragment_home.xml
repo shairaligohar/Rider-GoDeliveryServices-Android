@@ -91,7 +91,6 @@
             android:layout_marginBottom="50dp"
             android:gravity="center"
             android:text="No Active Orders"
-            app:layout_constraintBottom_toTopOf="@id/title_current_location"
             app:layout_constraintTop_toBottomOf="@+id/active_orders_list" />
 
         <TextView

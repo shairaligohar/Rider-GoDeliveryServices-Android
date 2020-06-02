@@ -63,6 +63,7 @@ class HomeViewModel : ViewModel() {
                     fetchActiveOrders(riderId)
                 },
                 { error ->
+                    fetchActiveOrders(riderId)
                     _showLoading.value = false
                     _noNewOrder.value = true
 //                    _responseMessage.value = "Please check your internet connection!"
@@ -76,7 +77,7 @@ class HomeViewModel : ViewModel() {
         disposable = apiService.fetchRiderOrders(riderId, "Active")
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
+                            .subscribe(
                 { orders ->
                     _showLoading.value = false
                     _riderActiveOrders.value = orders

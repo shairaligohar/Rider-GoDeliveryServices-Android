@@ -63,11 +63,12 @@
 
         <TextView
             android:id="@+id/branch_name_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Branch Name"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/customer_name_text"
             app:layout_constraintTop_toBottomOf="@id/separator" />
 
         <TextView
@@ -81,10 +82,12 @@
 
         <TextView
             android:id="@+id/customer_name_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:gravity="end"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Customer Name"
+            app:layout_constraintStart_toEndOf="@+id/branch_name_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/separator" />
 
@@ -122,24 +125,24 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:text="Navigation"
             android:textSize="12sp"
             app:icon="@drawable/ic_navigation_black_24dp"
             app:iconGravity="end"
             app:iconTint="@color/colorAccent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/customer_phone_text" />
+            app:layout_constraintTop_toBottomOf="@+id/separator_bottom" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/accept_order_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:text="Status"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/customer_phone_text" />
+            app:layout_constraintTop_toBottomOf="@+id/separator_bottom" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
